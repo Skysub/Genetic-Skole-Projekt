@@ -1,0 +1,5 @@
+class Specimen {
+
+  void Update() {
+  }
+}
