@@ -23,7 +23,8 @@ class MainLogic {
     textSize(30);
     fill(0, 0, 0);
 
-    text("Iteration: "+iteration, 20, 30);
+    if (Blink(2, true, false) && menu == 1) text("Iteration: "+iteration, 20, 30);
+    else if (menu != 1) text("Iteration: "+iteration, 20, 30);
   }
 
   void HandleInput(int k, boolean b) {
