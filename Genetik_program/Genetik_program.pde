@@ -9,3 +9,11 @@ void setup() {
 void draw() {
   mainLogic.Update();
 }
+
+void keyPressed() {
+  mainLogic.HandleInput(keyCode, true);
+}
+
+void keyReleased() {
+  mainLogic.HandleInput(keyCode, false);
+} 
