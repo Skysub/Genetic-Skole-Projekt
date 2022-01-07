@@ -22,8 +22,8 @@ class MainLogic {
   void DrawUI() {
     textSize(30);
     fill(0, 0, 0);
-    
-    text("Iteration: "+iteration,20,30);
+
+    text("Iteration: "+iteration, 20, 30);
   }
 
   void HandleInput(int k, boolean b) {
