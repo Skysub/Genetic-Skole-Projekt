@@ -4,7 +4,7 @@ class MainLogic {
   ArrayList<Specimen> matingPool;
   IntList graph;
   boolean done = true;
-  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10;
+  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10, best = 0;
 
   MainLogic() {
     graph = new IntList();
@@ -27,9 +27,14 @@ class MainLogic {
 
     //Build mating pool
     matingPool = new ArrayList<Specimen>();
+    best = 1;
 
     for (int i = 0; i < population.length; i++) {
-      int n = int(population[i].getFitness() * 100);
+      if (population[i].getFitness() > best) best = population[i].getFitness();
+    }
+
+    for (int i = 0; i < population.length; i++) {
+      int n = int((population[i].getFitness() / best) * 100);
       for (int j = 0; j < n; j++) {
         matingPool.add(population[i]);
       }
@@ -82,17 +87,18 @@ class MainLogic {
 
     fill(0, 0, 0);
     textSize(50);
-    text("Iteration: "+iteration, 30, 50);
+    text("Iteration: "+iteration, 28, 50);
+    text("Best fitness: "+best, 28, 94);
     textSize(30);
     boolean test = false;
-    if (Blink(3, test, false, 0.3f) && menu == 1) text("Max iterations: "+maxIteration, 30, 90);
-    else if (menu != 1) text("Max iterations: "+maxIteration, 30, 90);
+    if (Blink(3, test, false, 0.3f) && menu == 1) text("Max iterations: "+maxIteration, 30, 130);
+    else if (menu != 1) text("Max iterations: "+maxIteration, 30, 130);
 
-    if (Blink(3, test, false, 0.3f) && menu == 2) text("Population: "+pop, 30, 130);
-    else if (menu != 2) text("Population: "+pop, 30, 130);
+    if (Blink(3, test, false, 0.3f) && menu == 2) text("Population: "+pop, 30, 170);
+    else if (menu != 2) text("Population: "+pop, 30, 170);
 
-    if (Blink(3, test, false, 0.3f) && menu == 3) text("Mutation Rate: "+mutationRate/1000f, 30, 170);
-    else if (menu != 3) text("Mutation Rate: "+mutationRate/1000f, 30, 170);
+    if (Blink(3, test, false, 0.3f) && menu == 3) text("Mutation Rate: "+mutationRate/1000f, 30, 210);
+    else if (menu != 3) text("Mutation Rate: "+mutationRate/1000f, 30, 210);
 
     if (Blink(4, !test, false, 0)) DrawSelection(menu);
 
