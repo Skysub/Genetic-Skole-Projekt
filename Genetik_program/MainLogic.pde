@@ -4,8 +4,7 @@ class MainLogic {
   ArrayList<Specimen> matingPool;
   IntList graph;
   boolean done = true;
-  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100;
-  int mutationRate = 10;
+  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10;
 
   MainLogic() {
     graph = new IntList();
@@ -21,10 +20,41 @@ class MainLogic {
 
   //Returnerer true hvis der ikke skal køres flere iterationer.
   void RunIteration() {
+    //Calculate fitness
+    for (int i = 0; i < population.length; i++) {
+      population[i].Fitness();
+    }
+
+    //Build mating pool
+    matingPool = new ArrayList<Specimen>();
+
+    for (int i = 0; i < population.length; i++) {
+      int n = int(population[i].getFitness() * 100);
+      for (int j = 0; j < n; j++) {
+        matingPool.add(population[i]);
+      }
+    }
+
+    //Reproduce
+    for (int i = 0; i < population.length; i++) {
+      int a = int(random(matingPool.size()));
+      int b = int(random(matingPool.size()));
+      Specimen partnerA = matingPool.get(a);
+      Specimen partnerB = matingPool.get(b);
+      Specimen child = partnerA.Crossover(partnerB);
+      child.Mutate(mutationRate);
+      population[i] = child;
+    }
   }
 
   void StartSimulation() {
     done = false;
+    iteration = 0;
+
+    population = new Specimen[pop];
+    for (int i = 0; i < population.length; i++) {
+      population[i] = new Specimen();
+    }
   }
 
   void ContinueSimulation() {
@@ -36,28 +66,37 @@ class MainLogic {
     RunIteration();
   }
 
+  void Stop() {
+    done = true;
+  }
+
   void reset() {
     done = true;
     iteration = 0;
+    maxIteration = 100;
+    pop = 100;
+    mutationRate = 10;
   }
 
   void DrawUI() {
-    textSize(30);
+
     fill(0, 0, 0);
-
-    text("Iteration: "+iteration, 30, 30);
-
+    textSize(50);
+    text("Iteration: "+iteration, 30, 50);
+    textSize(30);
     boolean test = false;
-    if (Blink(3, test, false, 0.3f) && menu == 1) text("Max iterations: "+maxIteration, 30, 70);
-    else if (menu != 1) text("Max iterations: "+maxIteration, 30, 70);
+    if (Blink(3, test, false, 0.3f) && menu == 1) text("Max iterations: "+maxIteration, 30, 90);
+    else if (menu != 1) text("Max iterations: "+maxIteration, 30, 90);
 
-    if (Blink(3, test, false, 0.3f) && menu == 2) text("Population: "+pop, 30, 110);
-    else if (menu != 2) text("Population: "+pop, 30, 110);
+    if (Blink(3, test, false, 0.3f) && menu == 2) text("Population: "+pop, 30, 130);
+    else if (menu != 2) text("Population: "+pop, 30, 130);
 
-    if (Blink(3, test, false, 0.3f) && menu == 3) text("Mutation Rate: "+mutationRate/1000f, 30, 150);
-    else if (menu != 3) text("Mutation Rate: "+mutationRate/1000f, 30, 150);
+    if (Blink(3, test, false, 0.3f) && menu == 3) text("Mutation Rate: "+mutationRate/1000f, 30, 170);
+    else if (menu != 3) text("Mutation Rate: "+mutationRate/1000f, 30, 170);
 
     if (Blink(4, !test, false, 0)) DrawSelection(menu);
+
+    if (!done) text("Simulation running", 400, 50);
   }
 
   void HandleControls() {
@@ -66,6 +105,8 @@ class MainLogic {
     if (kb.Shift(38)) add(1);
     if (kb.Shift(40)) add(-1);
     if (kb.Shift(82)) reset(); //r
+    if (kb.Shift(10) && done) StartSimulation();
+    if (kb.Shift(32)) Stop();
 
     kb.Update();
   }
@@ -93,7 +134,7 @@ class MainLogic {
   }
 
   void DrawSelection(int offset) {
-    if (menu != 0)rect(7, offset * 40 + 16, 15, 4);
+    if (menu != 0)rect(7, offset * 40 + 36, 15, 4);
   }
 
   void HandleInput(int x, boolean y) {
