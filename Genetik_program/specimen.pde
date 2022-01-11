@@ -3,6 +3,7 @@ class Specimen {
   int fitness = 0; //between 1 and 0
   boolean[] genes;
   int ialt = 24;
+  boolean base;
   int[][] objects = {{90, 150}, 
     {130, 35}, 
     {1530, 200}, 
@@ -30,11 +31,13 @@ class Specimen {
 
   Random rd;
 
-  Specimen() {
+  Specimen(boolean b) {
+    base = b;
     rd = new Random();
     genes = new boolean[ialt];
     for (int i = 0; i < ialt; i++) {
       genes[i] = rd.nextBoolean();
+      if (base) genes[i] = false;
     }
   }
 
@@ -52,10 +55,11 @@ class Specimen {
       return;
     }
     fitness = money;
+    if (fitness == 0) fitness = 1;
   }
 
   Specimen Crossover(Specimen partner) {
-    Specimen child = new Specimen();
+    Specimen child = new Specimen(base);
     int midpoint = int(random(ialt));
     for (int i = 0; i < ialt; i++) {
       if (i > midpoint) child.genes[i] = genes[i];
@@ -64,9 +68,9 @@ class Specimen {
     return child;
   }
 
-  void Mutate(int mutationRate) {
+  void Mutate(float mutationRate) {
     for (int i = 0; i < ialt; i++) {
-      if (random(1) < mutationRate) {
+      if (random(1) < mutationRate) { //<>//
         genes[i] = rd.nextBoolean();
       }
     }

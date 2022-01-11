@@ -1,14 +1,19 @@
-class MainLogic {
+class MainLogic { //<>//
   Keyboard kb;
   Specimen[] population;
   ArrayList<Specimen> matingPool;
   IntList graph;
-  boolean done = true;
-  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10, best = 0;
+  boolean done = true, base = false;
+  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10, best = 0, wait = 0;
+  boolean[] bestGenes;
 
   MainLogic() {
     graph = new IntList();
     kb = new Keyboard();
+    bestGenes = new boolean[24];
+    for (int i = 0; i < 24; i++) {
+      bestGenes[i] = false;
+    }
   }
 
   void Update() {
@@ -20,6 +25,8 @@ class MainLogic {
 
   //Returnerer true hvis der ikke skal køres flere iterationer.
   void RunIteration() {
+    delay(wait);
+    //delay(100);
     //Calculate fitness
     for (int i = 0; i < population.length; i++) {
       population[i].Fitness();
@@ -30,7 +37,10 @@ class MainLogic {
     best = 1;
 
     for (int i = 0; i < population.length; i++) {
-      if (population[i].getFitness() > best) best = population[i].getFitness();
+      if (population[i].getFitness() > best) { 
+        best = population[i].getFitness();
+        bestGenes = population[i].getGenes();
+      }
     }
 
     for (int i = 0; i < population.length; i++) {
@@ -47,7 +57,7 @@ class MainLogic {
       Specimen partnerA = matingPool.get(a);
       Specimen partnerB = matingPool.get(b);
       Specimen child = partnerA.Crossover(partnerB);
-      child.Mutate(mutationRate);
+      child.Mutate(mutationRate/1000f);
       population[i] = child;
     }
   }
@@ -58,7 +68,7 @@ class MainLogic {
 
     population = new Specimen[pop];
     for (int i = 0; i < population.length; i++) {
-      population[i] = new Specimen();
+      population[i] = new Specimen(base);
     }
   }
 
@@ -100,13 +110,22 @@ class MainLogic {
     if (Blink(3, test, false, 0.3f) && menu == 3) text("Mutation Rate: "+mutationRate/1000f, 30, 210);
     else if (menu != 3) text("Mutation Rate: "+mutationRate/1000f, 30, 210);
 
-    if (Blink(4, !test, false, 0)) DrawSelection(menu);
+    if (Blink(3, test, false, 0.3f) && menu == 4) text("Delay after iteration (ms): "+wait, 30, 250);
+    else if (menu != 4) text("Delay after iteration (ms): "+wait, 30, 250);
+    
+    text("Population's dna starts as 0's: "+base, 30, 290);
 
+    if (Blink(4, !test, false, 0)) DrawSelection(menu);
     if (!done) text("Simulation running", 400, 50);
+
+    for (int i = 0; i < 24; i++) {
+      if (bestGenes[i])text(1, 400 + 30*i, 950);
+      else text(0, 400 + 30*i, 950);
+    }
   }
 
   void HandleControls() {
-    if (kb.Shift(39) && menu != 3) menu++;
+    if (kb.Shift(39) && menu != 5) menu++;
     if (kb.Shift(37) && menu != 0) menu--;
     if (kb.Shift(38)) add(1);
     if (kb.Shift(40)) add(-1);
@@ -120,13 +139,13 @@ class MainLogic {
   void add(int x) {
     switch (menu) {
     case 1:
-      if (kb.getKey(16)) maxIteration+=x;
+      if (kb.getKey(16)) maxIteration+=(x*1);
       else maxIteration+=(x*10);
       if (maxIteration < 1) maxIteration = 1;
       break;
     case 2:
-      if (kb.getKey(16)) pop+=(x);
-      else pop+=(x*25);
+      if (kb.getKey(16)) pop+=(x*1);
+      else pop+=(x*10);
       if (pop < 4) pop = 4;
 
       break;
@@ -136,11 +155,20 @@ class MainLogic {
       if (mutationRate > 1000) mutationRate = 1000;
       else if (mutationRate < 1) mutationRate = 1;
       break;
+    case 4:
+      if (kb.getKey(16)) wait+=(x);
+      else wait+=(x*5);
+      if (wait < 0) wait = 0;
+      break;
+    case 5:
+      if(x > 0) base = true;
+      else base = false;
+      break;
     }
   }
 
   void DrawSelection(int offset) {
-    if (menu != 0)rect(7, offset * 40 + 36, 15, 4);
+    if (menu != 0)rect(7, offset * 40 + 76, 15, 4);
   }
 
   void HandleInput(int x, boolean y) {
