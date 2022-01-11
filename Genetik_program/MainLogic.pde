@@ -2,13 +2,14 @@ class MainLogic { //<>//
   Keyboard kb;
   Specimen[] population;
   ArrayList<Specimen> matingPool;
-  IntList graph;
+  int[] graph;
+  int graphNext = 0;
   boolean done = true, base = false;
-  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 10, best = 0, wait = 0;
+  int iteration = 0, maxIteration = 100, blinkT = 0, menu = 0, pop = 100, mutationRate = 20, best = 0, wait = 0;
+  int safeMax = 0;
   boolean[] bestGenes;
 
   MainLogic() {
-    graph = new IntList();
     kb = new Keyboard();
     bestGenes = new boolean[24];
     for (int i = 0; i < 24; i++) {
@@ -60,12 +61,17 @@ class MainLogic { //<>//
       child.Mutate(mutationRate/1000f);
       population[i] = child;
     }
+
+    graph[graphNext] = best;
+    graphNext++;
   }
 
   void StartSimulation() {
     done = false;
     iteration = 0;
-
+    graphNext = 0;
+    safeMax = maxIteration;
+    graph = new int[maxIteration];
     population = new Specimen[pop];
     for (int i = 0; i < population.length; i++) {
       population[i] = new Specimen(base);
@@ -73,7 +79,7 @@ class MainLogic { //<>//
   }
 
   void ContinueSimulation() {
-    if (iteration == maxIteration) {
+    if (iteration == safeMax) {
       done = true;
       return;
     }
@@ -94,11 +100,11 @@ class MainLogic { //<>//
   }
 
   void DrawUI() {
-
     fill(0, 0, 0);
     textSize(50);
     text("Iteration: "+iteration, 28, 50);
     text("Best fitness: "+best, 28, 94);
+    text("Controls", 1450, 50);
     textSize(30);
     boolean test = false;
     if (Blink(3, test, false, 0.3f) && menu == 1) text("Max iterations: "+maxIteration, 30, 130);
@@ -112,16 +118,41 @@ class MainLogic { //<>//
 
     if (Blink(3, test, false, 0.3f) && menu == 4) text("Delay after iteration (ms): "+wait, 30, 250);
     else if (menu != 4) text("Delay after iteration (ms): "+wait, 30, 250);
-    
+
     text("Population's dna starts as 0's: "+base, 30, 290);
 
     if (Blink(4, !test, false, 0)) DrawSelection(menu);
-    if (!done) text("Simulation running", 400, 50);
+    if (!done) text("Simulation running", 500, 50);
 
     for (int i = 0; i < 24; i++) {
-      if (bestGenes[i])text(1, 400 + 30*i, 950);
-      else text(0, 400 + 30*i, 950);
+      if (bestGenes[i])text(1, 500 + 30*i, 800);
+      else text(0, 500 + 30*i, 800);
     }
+
+    line(99, 801, 500, 801);
+    line(99, 801, 99, 400);
+    
+    for (int i = 0; i < graphNext; i++) {
+      pushMatrix();
+      translate(100+(i*2), 800-int(graph[i]/3f));
+      circle(0, 0, 2);
+      if (i == graphNext-1) {
+        text(best, 10, -10);
+        textSize(20);
+        text(iteration, 13, 13);
+      }
+      popMatrix();
+    }
+    pushMatrix();
+    translate(1350, 100);
+    textSize(20);
+    text("Left/right arrowkeys control the menu selection", 0, 0);
+    text("Up/down arrow keys add/subtract from the shown value", 0, 35);
+    text("Hold shift to add/subtract less", 0, 70);
+    text("Enter, starts the simulation", 0, 105);
+    text("Space stops the simulation", 0, 140);
+    text("R resets to default values", 0, 175);
+    popMatrix();
   }
 
   void HandleControls() {
@@ -161,7 +192,7 @@ class MainLogic { //<>//
       if (wait < 0) wait = 0;
       break;
     case 5:
-      if(x > 0) base = true;
+      if (x > 0) base = true;
       else base = false;
       break;
     }

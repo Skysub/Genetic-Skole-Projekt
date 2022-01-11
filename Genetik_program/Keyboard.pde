@@ -2,8 +2,8 @@ class Keyboard {
   private Key[] keys;
 
   public Keyboard() {
-    keys = new Key[128];
-    for (int i = 0; i < 128; i++) {
+    keys = new Key[256];
+    for (int i = 0; i < 256; i++) {
       keys[i] = new Key();
     }
   }

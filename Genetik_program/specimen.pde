@@ -70,7 +70,7 @@ class Specimen {
 
   void Mutate(float mutationRate) {
     for (int i = 0; i < ialt; i++) {
-      if (random(1) < mutationRate) { //<>//
+      if (random(1) < mutationRate) {
         genes[i] = rd.nextBoolean();
       }
     }
