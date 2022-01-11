@@ -29,7 +29,7 @@ class Specimen {
     {900, 1}, 
     {2000, 150}};
 
-  Random rd;
+  Random rd; //Used to make random booleans
 
   Specimen(boolean b) {
     base = b;
@@ -41,6 +41,9 @@ class Specimen {
     }
   }
 
+  //Calculates fitness
+  //Fitness cant be under 1
+  //Theres a large penalty for having too high a weight
   void Fitness() {
     int money = 0;
     int weight = 0;
@@ -58,6 +61,7 @@ class Specimen {
     if (fitness == 0) fitness = 1;
   }
 
+  //Shuffles to specimens together into a new specimen
   Specimen Crossover(Specimen partner) {
     Specimen child = new Specimen(base);
     int midpoint = int(random(ialt));
@@ -68,6 +72,7 @@ class Specimen {
     return child;
   }
 
+  //Changes some of the values in the genes randomly based on the mutationRate
   void Mutate(float mutationRate) {
     for (int i = 0; i < ialt; i++) {
       if (random(1) < mutationRate) {

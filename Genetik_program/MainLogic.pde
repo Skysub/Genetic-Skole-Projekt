@@ -10,7 +10,8 @@ class MainLogic { //<>//
   boolean[] bestGenes;
 
   MainLogic() {
-    kb = new Keyboard();
+    //I coded the keyboard and key classes myself, as my old solution to add controls is ineffecient and tedious.
+    kb = new Keyboard(); //gotta have controls
     bestGenes = new boolean[24];
     for (int i = 0; i < 24; i++) {
       bestGenes[i] = false;
@@ -19,12 +20,11 @@ class MainLogic { //<>//
 
   void Update() {
     HandleControls();
-    //println(menu);
     if (!done) ContinueSimulation();
     DrawUI();
   }
 
-  //Returnerer true hvis der ikke skal køres flere iterationer.
+  //Does every step of an iteration
   void RunIteration() {
     delay(wait);
     //delay(100);
@@ -66,6 +66,7 @@ class MainLogic { //<>//
     graphNext++;
   }
 
+  //Preps the simulation and initializes arrays of the correct size and such
   void StartSimulation() {
     done = false;
     iteration = 0;
@@ -78,6 +79,7 @@ class MainLogic { //<>//
     }
   }
 
+  //pretty self explanatory
   void ContinueSimulation() {
     if (iteration == safeMax) {
       done = true;
@@ -87,10 +89,12 @@ class MainLogic { //<>//
     RunIteration();
   }
 
+  //stops the simulation
   void Stop() {
     done = true;
   }
 
+  //Resets to default values
   void reset() {
     done = true;
     iteration = 0;
@@ -99,6 +103,7 @@ class MainLogic { //<>//
     mutationRate = 10;
   }
 
+  //Draws every part of the screen image
   void DrawUI() {
     fill(0, 0, 0);
     textSize(50);
@@ -132,6 +137,7 @@ class MainLogic { //<>//
     line(99, 801, 500, 801);
     line(99, 801, 99, 400);
     
+    //Draws the graph
     for (int i = 0; i < graphNext; i++) {
       pushMatrix();
       translate(100+(i*2), 800-int(graph[i]/3f));
@@ -143,6 +149,8 @@ class MainLogic { //<>//
       }
       popMatrix();
     }
+    
+    //Draws the controls
     pushMatrix();
     translate(1350, 100);
     textSize(20);
@@ -155,6 +163,7 @@ class MainLogic { //<>//
     popMatrix();
   }
 
+  //checking all relevant keys
   void HandleControls() {
     if (kb.Shift(39) && menu != 5) menu++;
     if (kb.Shift(37) && menu != 0) menu--;
@@ -167,6 +176,7 @@ class MainLogic { //<>//
     kb.Update();
   }
 
+  //doing stuff in menus
   void add(int x) {
     switch (menu) {
     case 1:
@@ -178,7 +188,6 @@ class MainLogic { //<>//
       if (kb.getKey(16)) pop+=(x*1);
       else pop+=(x*10);
       if (pop < 4) pop = 4;
-
       break;
     case 3:
       if (kb.getKey(16)) mutationRate+=(x);
@@ -198,16 +207,18 @@ class MainLogic { //<>//
     }
   }
 
+  //The selection marker is drawn
   void DrawSelection(int offset) {
     if (menu != 0)rect(7, offset * 40 + 76, 15, 4);
   }
 
+  //Function called whenever a keypress happens
   void HandleInput(int x, boolean y) {
-    //println(x);
-    //32[ ] 10[enter] 82[r] 16[shift]
     kb.setKey(x, y);
   }
 
+  //A function i wrote to allow me full control of a blinking object.
+  // Frequency of course, b is to disable the blinking, shift is so that whenever it would be true, its false, and more extends the time that its on per cycle by a percentage passed to it.
   boolean Blink(float frekvens, boolean b, boolean shift, float more)
   {
     if (!b) //Support for at blink kan slås fra ved at pass et variabel til metoden
